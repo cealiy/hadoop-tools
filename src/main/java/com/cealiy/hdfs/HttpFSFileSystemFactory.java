@@ -14,6 +14,7 @@ public class HttpFSFileSystemFactory {
 	private static String port;
 	
 	
+	
 	public static HttpFSFileSystem get(){
 		HttpFSFileSystem fs=null;
 		try {
@@ -43,6 +44,9 @@ public class HttpFSFileSystemFactory {
 		return fs;
 	}
 
+	public static String getHdfsUri(){
+		return "webhdfs://"+HttpFSFileSystemFactory.host+":"+HttpFSFileSystemFactory.port;
+	}
 
 	public String getUser() {
 		return user;
