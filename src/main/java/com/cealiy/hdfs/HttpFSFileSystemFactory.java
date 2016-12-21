@@ -7,20 +7,20 @@ import org.apache.hadoop.conf.Configuration;
 
 public class HttpFSFileSystemFactory {
 	
-	private static String user;
+	private String user;
 	
-	private static String host;
+	private String host;
 	
-	private static String port;
+	private String port;
 	
 	
 	
-	public static HttpFSFileSystem get(){
+	public HttpFSFileSystem get(){
 		HttpFSFileSystem fs=null;
 		try {
-			URI temp=new URI("webhdfs://"+host+":"+port);
+			URI temp=new URI("webhdfs://"+this.host+":"+this.port);
 			fs=new HttpFSFileSystem();
-			fs.setHODOOP_HTTPFS_USER(user);
+			fs.setHODOOP_HTTPFS_USER(this.user);
 			Configuration conf=new Configuration();
 			fs.initialize(temp,conf);
 		} catch (Exception e) {
@@ -44,17 +44,12 @@ public class HttpFSFileSystemFactory {
 		return fs;
 	}
 
-	public static String getHdfsUri(){
-		return "webhdfs://"+HttpFSFileSystemFactory.host+":"+HttpFSFileSystemFactory.port;
+	public String getHdfsUri(){
+		return "webhdfs://"+this.host+":"+this.port;
 	}
 
 	public String getUser() {
 		return user;
-	}
-
-
-	public void setUser(String user) {
-		HttpFSFileSystemFactory.user = user;
 	}
 
 
@@ -64,7 +59,7 @@ public class HttpFSFileSystemFactory {
 
 
 	public void setHost(String host) {
-		HttpFSFileSystemFactory.host = host;
+		this.host = host;
 	}
 
 
@@ -74,9 +69,15 @@ public class HttpFSFileSystemFactory {
 
 
 	public void setPort(String port) {
-		HttpFSFileSystemFactory.port = port;
+		this.port = port;
 	}
-	
+
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+
 	
 
 }

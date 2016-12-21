@@ -22,6 +22,10 @@ public class SSHClient {
 
 	private String password;
 	
+	public SSHClient(){
+		
+	}
+	
 	public SSHClient(String host,int port,String user,String password){
 		this.host=host;
 		this.port=port;
