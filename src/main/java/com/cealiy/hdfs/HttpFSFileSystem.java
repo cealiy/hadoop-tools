@@ -496,16 +496,17 @@ public class HttpFSFileSystem extends FileSystem implements Renewable {
 		long blockSize = ((Long) json.get("blockSize")).longValue();
 		short replication = ((Long) json.get("replication")).shortValue();
 		FileStatus fileStatus = null;
-		switch (type.ordinal()) {
-		case 1:
-		case 2:
+		switch (type.ordinal()) 
+		{
+		default:
 			fileStatus = new FileStatus(len, type == HttpFSFileSystem.FILE_TYPE.DIRECTORY, replication, blockSize,
 					mTime, aTime, permission, owner, group, path);
 			break;
-		case 3:
+		case 2:
 			Object symLink = null;
 			fileStatus = new FileStatus(len, false, replication, blockSize, mTime, aTime, permission, owner, group,
 					(Path) symLink, path);
+			break;
 		}
 
 		return fileStatus;

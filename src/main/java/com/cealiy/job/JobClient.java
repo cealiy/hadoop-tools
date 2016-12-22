@@ -1,5 +1,11 @@
 package com.cealiy.job;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +40,45 @@ public class JobClient {
 	
 	public final static String PARAM_SEGMENT=" ";
 	
+
+	public Map<String,String> readResult(String resultDir){
+		if(resultDir==null||resultDir.isEmpty()){
+			return new HashMap<String,String>();
+		}
+		try{
+			HttpFSFileSystem fileSystem=httpFSFileSystemFactory.get();
+			String hdfsOut=httpFSFileSystemFactory.getHdfsUri()+this.getHdfsOutPath()+resultDir+"/part-r-00000";
+			Path out=new Path(hdfsOut);
+			if(!fileSystem.exists(out)){
+				return new HashMap<String,String>();
+			}
+			FSDataInputStream in=fileSystem.open(out);
+			List<String> lines=IOUtils.readLines(in,"utf-8");
+			Map<String,String> map=new HashMap<String,String>();
+			for(String line:lines){
+				if(line.isEmpty()){
+					continue;
+				}
+				String[] temp=line.split("\t");
+				if(temp==null||temp.length!=2){
+					continue;
+				}
+				map.put(temp[0].trim(), temp[1].trim());
+			}
+			IOUtils.closeQuietly(in);
+			return map;
+		}catch(Exception e){
+			logger.error("error",e);
+		}
+		return new HashMap<String,String>();
+		
+		
+	}
+	
 	public void execute(String statisticPath,String resultDir){
+		if(statisticPath==null||resultDir==null){
+			return;
+		}
 		checkConf();
 		try{
 			GitPullAndPackage run=new GitPullAndPackage(this.gitPath,this.sshClient);
@@ -54,7 +98,7 @@ public class JobClient {
 			String out2=sshClient.exeCommand(exe.toString());
 			logger.info(out2);
 		}catch(Exception e){
-			e.printStackTrace();
+			logger.error("error",e);
 		}
 		
 	}
