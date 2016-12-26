@@ -90,6 +90,7 @@ public class JobClient {
 				fileSystem.delete(hdfsInPath,false);
 			}
 			fileSystem.copyFromLocalFile(new Path(statisticPath),new Path(hdfsIn));
+			logger.info("copy finished......");
 			StringBuilder exe=new StringBuilder();
 			exe.append("cd").append(PARAM_SEGMENT).append(this.hadoopHome).append("&&");
 			exe.append(EXE_HADOOP_JAR).append(PARAM_SEGMENT).append(this.gitPath).append("/target/").append(this.jobJar);
