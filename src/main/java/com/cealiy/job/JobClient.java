@@ -3,10 +3,11 @@ package com.cealiy.job;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,33 +48,33 @@ public class JobClient {
 		}
 		try{
 			HttpFSFileSystem fileSystem=httpFSFileSystemFactory.get();
-			String hdfsOut=httpFSFileSystemFactory.getHdfsUri()+this.getHdfsOutPath()+resultDir+"/part-r-00000";
+			String hdfsOut=httpFSFileSystemFactory.getHdfsUri()+this.getHdfsOutPath()+resultDir;
 			Path out=new Path(hdfsOut);
-			if(!fileSystem.exists(out)){
-				return new HashMap<String,String>();
-			}
-			FSDataInputStream in=fileSystem.open(out);
-			List<String> lines=IOUtils.readLines(in,"utf-8");
+			RemoteIterator<LocatedFileStatus> files=fileSystem.listFiles(out,true);
 			Map<String,String> map=new HashMap<String,String>();
-			for(String line:lines){
-				if(line.isEmpty()){
-					continue;
+			while(files.hasNext()){
+				Path path=files.next().getPath();
+				FSDataInputStream in=fileSystem.open(path);
+				List<String> lines=IOUtils.readLines(in,"utf-8");
+				for(String line:lines){
+					if(line.isEmpty()){
+						continue;
+					}
+					String[] temp=line.split("\t");
+					if(temp==null||temp.length!=2){
+						continue;
+					}
+					map.put(temp[0].trim(), temp[1].trim());
 				}
-				String[] temp=line.split("\t");
-				if(temp==null||temp.length!=2){
-					continue;
-				}
-				map.put(temp[0].trim(), temp[1].trim());
+				IOUtils.closeQuietly(in);	
 			}
-			IOUtils.closeQuietly(in);
 			return map;
 		}catch(Exception e){
 			logger.error("error",e);
 		}
 		return new HashMap<String,String>();
-		
-		
 	}
+	
 	
 	public void execute(String statisticPath,String resultDir){
 		if(statisticPath==null||resultDir==null){
@@ -103,6 +104,10 @@ public class JobClient {
 		}
 		
 	}
+
+	
+	
+	
 	
 	
 	private void checkConf(){
