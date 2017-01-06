@@ -82,8 +82,6 @@ public class JobClient {
 		}
 		checkConf();
 		try{
-			GitPullAndPackage run=new GitPullAndPackage(this.gitPath,this.sshClient);
-			new Thread(run).start();
 			HttpFSFileSystem fileSystem=httpFSFileSystemFactory.get();
 			String hdfsIn=httpFSFileSystemFactory.getHdfsUri()+this.getHdfsInPath()+resultDir;
 			Path hdfsInPath=new Path(hdfsIn);
@@ -104,10 +102,6 @@ public class JobClient {
 		}
 		
 	}
-
-	
-	
-	
 	
 	
 	private void checkConf(){
@@ -181,6 +175,7 @@ public class JobClient {
 	}
 
 	
+	
 	public String getHdfsInPath(){
 		return "/input/"+this.hdfsPrefix+"/";
 	}
@@ -189,7 +184,9 @@ public class JobClient {
 		return "/output/"+this.hdfsPrefix+"/";
 	}
 	
-	private class GitPullAndPackage implements Runnable{
+	
+	
+	public class GitPullAndPackage implements Runnable{
 		
 		private String gitPath;
 		
